@@ -10,7 +10,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.example.spark.test.api.Main;
+import com.example.spark.test.api.API;
 import com.example.spark.test.slidealbums.SlideAlbum;
 import com.example.spark.test.util.TestUtil;
 import com.example.spark.test.util.TestUtil.TestResponse;
@@ -22,7 +22,7 @@ public class SlideAlbumsMgrIntTest {
 
 	@BeforeClass
 	public static void beforeClass() {
-		Main.main(null);
+		API.main(null);
 	}
 	
 	@AfterClass
