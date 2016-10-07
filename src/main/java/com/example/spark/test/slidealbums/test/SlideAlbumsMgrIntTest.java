@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.AfterClass;
@@ -15,6 +16,9 @@ import com.example.spark.test.slidealbums.SlideAlbum;
 import com.example.spark.test.util.TestUtil;
 import com.example.spark.test.util.TestUtil.TestResponse;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
 
 import spark.Spark;
 
@@ -32,14 +36,22 @@ public class SlideAlbumsMgrIntTest {
 	
 	@Test
 	public void getSlideAlbumsTest() {
+		
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("customers", Arrays.asList("Harley Davidson"));
+		data.put("sessionToken", "exampleSessionTokenHere");
 		TestResponse response = TestUtil.postRequest("/spark/api/slidealbums", data);
-		assertEquals(200, response.status);
+		assertEquals(200, response.status); 		
 		String body = response.body;
-		SlideAlbum[] albums = new Gson().fromJson(body, SlideAlbum[].class);
-		assertTrue(albums.length > 0);
-		SlideAlbum album = albums[0];
+		JsonObject jobj = new Gson().fromJson(body, JsonObject.class);
+		String sessionToken = jobj.get("sessionToken").getAsString();
+		String slideAlbumsAsSt = new Gson().toJson(jobj.get("slideAlbums"));
+		Type collectionType = new TypeToken<List<SlideAlbum>>(){}.getType();
+		List<SlideAlbum> albums = new Gson().fromJson(slideAlbumsAsSt, collectionType);
+		assertNotNull(sessionToken);
+		assertNotNull(albums);
+		assertTrue(albums.size() > 0);
+		SlideAlbum album = albums.get(1);
 		assertNotNull(album);
 		assertNotNull(album.getTitle());
 		assertNotNull(album.getCustomer());
@@ -49,5 +61,15 @@ public class SlideAlbumsMgrIntTest {
 		assertNotNull(album.getSvg());
 	}
 	
+	@Test
+	public void getSlideAlbumsTestInvalidToken() {
+		
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("customers", Arrays.asList("Harley Davidson"));
+		TestResponse response = TestUtil.postRequest("/spark/api/slidealbums", data);
+		assertEquals(401, response.status); // no/invalid session token is passed, so request is unauthorized
+		String body = response.body;
+		assertTrue(body == null || body.equals(""));
+	}
 	
 }
