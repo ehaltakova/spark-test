@@ -19,8 +19,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-import com.google.gson.Gson;
-
 public class TestUtil {
 
 	public static TestResponse postRequest(String path, Map<String, Object> data) {
@@ -30,7 +28,7 @@ public class TestUtil {
 			HttpPost post = new HttpPost(url);
 			post.setHeader("Content-Type", "application/x-www-form-urlencoded"); 
 			post.setHeader("charset", "utf-8");
-			StringEntity body = new StringEntity(new Gson().toJson(data));
+			StringEntity body = new StringEntity(JsonUtil.toJson(data));
 			post.setEntity(body);
 
 			HttpResponse response = client.execute(post);

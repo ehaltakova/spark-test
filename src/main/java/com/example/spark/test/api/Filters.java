@@ -3,7 +3,7 @@ package com.example.spark.test.api;
 import java.util.HashMap;
 
 import com.example.spark.test.auth.AuthenticationMgr;
-import com.google.gson.Gson;
+import com.example.spark.test.util.JsonUtil;
 
 import spark.Filter;
 import spark.Request;
@@ -15,7 +15,6 @@ import spark.Spark;
  * @author Elitza Haltakova
  *
  */
-@SuppressWarnings("unchecked")
 public class Filters {
 
 	private static AuthenticationMgr authMgr = new AuthenticationMgr();
@@ -25,7 +24,7 @@ public class Filters {
 	 * Check if session token passed in the request is valid.
 	 */
 	public static Filter ensureSessionTokenIsValid = (Request request, Response response) -> {
-		HashMap<String, Object> requestData = new Gson().fromJson(request.body(), HashMap.class);
+		HashMap<String, Object> requestData = JsonUtil.fromJson(request.body());
 		if(requestData == null) {
 			Spark.halt(401, "Unauthorized access.");
 		}
@@ -49,11 +48,11 @@ public class Filters {
 	 * Regenerate session token and put the new one into the response
 	 */
 	public static Filter regenerateSessionToken = (Request request, Response response) -> {
-		HashMap<String, Object> requestData = new Gson().fromJson(request.body(), HashMap.class);
+		HashMap<String, Object> requestData = JsonUtil.fromJson(request.body());
 		String oldSessionToken = requestData.get("sessionToken") != null ? (String) requestData.get("sessionToken") : null;
 		String newSessionToken = authMgr.regenerateSessionToken(oldSessionToken);
-		HashMap<String, Object> responseData = new Gson().fromJson(response.body(), HashMap.class);
+		HashMap<String, Object> responseData = JsonUtil.fromJson(response.body());
 		responseData.put("sessionToken", newSessionToken);
-		response.body(new Gson().toJson(responseData));
+		response.body(JsonUtil.toJson(responseData));
 	};
 }

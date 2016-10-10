@@ -13,9 +13,9 @@ import org.junit.Test;
 
 import com.example.spark.test.api.API;
 import com.example.spark.test.slidealbums.SlideAlbum;
+import com.example.spark.test.util.JsonUtil;
 import com.example.spark.test.util.TestUtil;
 import com.example.spark.test.util.TestUtil.TestResponse;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
@@ -43,11 +43,12 @@ public class SlideAlbumsMgrIntTest {
 		TestResponse response = TestUtil.postRequest("/spark/api/slidealbums", data);
 		assertEquals(200, response.status); 		
 		String body = response.body;
-		JsonObject jobj = new Gson().fromJson(body, JsonObject.class);
+		JsonObject jobj = JsonUtil.fromJsonToClass(body, JsonObject.class);
 		String sessionToken = jobj.get("sessionToken").getAsString();
-		String slideAlbumsAsSt = new Gson().toJson(jobj.get("slideAlbums"));
+		String slideAlbumsAsSt = JsonUtil.toJson(jobj.get("slideAlbums"));
 		Type collectionType = new TypeToken<List<SlideAlbum>>(){}.getType();
-		List<SlideAlbum> albums = new Gson().fromJson(slideAlbumsAsSt, collectionType);
+		@SuppressWarnings("unchecked")
+		List<SlideAlbum> albums = (List<SlideAlbum>) JsonUtil.fromJsonToType(slideAlbumsAsSt, collectionType);
 		assertNotNull(sessionToken);
 		assertNotNull(albums);
 		assertTrue(albums.size() > 0);
@@ -83,7 +84,7 @@ public class SlideAlbumsMgrIntTest {
 		assertEquals(200, response.status); 
 		String body = response.body;
 		assertFalse(body == null || body.equals(""));
-		SlideAlbum album = new Gson().fromJson(body, SlideAlbum.class);
+		SlideAlbum album = JsonUtil.fromJsonToClass(body, SlideAlbum.class);
 		assertEquals(album.getTitle(), title);
 		assertEquals(album.getCustomer(), customer);
 		assertEquals("AC2_updated", album.getSvg());

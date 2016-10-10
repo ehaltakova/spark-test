@@ -8,7 +8,7 @@ import java.util.List;
 
 import com.example.spark.test.slidealbums.SlideAlbum;
 import com.example.spark.test.slidealbums.SlideAlbumsMgr;
-import com.google.gson.Gson;
+import com.example.spark.test.util.JsonUtil;
 
 /**
  * Main API class defining all the end points
@@ -17,7 +17,6 @@ import com.google.gson.Gson;
  */
 public class API {
 
-	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
 		 
 		SlideAlbumsMgr slideAlbumsMgr = new SlideAlbumsMgr();
@@ -29,12 +28,13 @@ public class API {
 		get("/hello", (req, res) -> "Hello World");
 		 
 		post("/spark/api/slidealbums", (request, response) -> {
-			HashMap<String, Object> data = new Gson().fromJson(request.body(), HashMap.class);
-			List<String> customers = data.get("customers") != null ? (ArrayList<String>) data.get("customers") : new ArrayList<String>();			
+			HashMap<String, Object> data = JsonUtil.fromJson(request.body());
+			@SuppressWarnings("unchecked")
+			List<String> customers = data.get("customers") != null ? (List<String>) data.get("customers") : new ArrayList<String>();			
 			List<SlideAlbum> slideAlbums = slideAlbumsMgr.getSlideAlbums(customers);
 			HashMap<String, Object> responseData = new HashMap<String, Object>();
 			responseData.put("slideAlbums", slideAlbums);
-			return new Gson().toJson(responseData);
+			return JsonUtil.toJson(responseData);
 		});		
 		
 		// test route
@@ -45,7 +45,7 @@ public class API {
 			if(slideAlbum == null) {
 				halt(404, "No such slide album is found");
 			}
-			return new Gson().toJson(slideAlbum);
+			return JsonUtil.toJson(slideAlbum);
 		});		
 	}
 	
