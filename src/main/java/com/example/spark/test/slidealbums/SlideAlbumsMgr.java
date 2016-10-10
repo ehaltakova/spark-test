@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.commons.io.FilenameUtils;
 
 import com.example.spark.test.slidealbums.SlideAlbum.Builder;
+import com.example.spark.test.util.Util;
 
 public class SlideAlbumsMgr {
 
@@ -78,9 +79,33 @@ public class SlideAlbumsMgr {
 		return slideAlbum;
 	}
 	
+	public SlideAlbum createSlideAlbum(String title, String customer, String fileName) {
+
+		SlideAlbum slideAlbum = null;
+		
+		File customerDir = new File(this.workspacesDir + "/" + customer);
+		if(!customerDir.exists()) {
+			customerDir.mkdir();
+		}
+		File slideAlbumDir = new File(this.workspacesDir + "/" + customer + "/" + title);
+		slideAlbumDir.mkdir();
+		File file = new File(Util.uploadDirPath + "/" + fileName);
+		file.renameTo(new File(slideAlbumDir.getPath() + "/" + fileName));
+		
+		SlideAlbum.Builder builder = new Builder(title, customer).modificationDate(slideAlbumDir.lastModified()).svg(FilenameUtils.getBaseName(fileName));
+		List<SlideAlbumFile> files = new ArrayList<SlideAlbumFile>(); 
+		files.add(new SlideAlbumFile("svg", FilenameUtils.getBaseName(fileName)));
+		slideAlbum = builder.files(files).build();
+		
+		return slideAlbum;
+	}
+	
 	// for test purposes
 	public static void main(String[] args) {
 		System.out.println(new SlideAlbumsMgr().getSlideAlbums(Arrays.asList("Bosch", "Harley Davidson")));
 		System.out.println(new SlideAlbumsMgr().getSlideAlbum("AC 2", "Bosch"));
+		System.out.println(new SlideAlbumsMgr().createSlideAlbum("Eli test 1234567", "Bosch", "Central Locking_01.svg"));
+		
 	}
+
 }

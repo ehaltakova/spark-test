@@ -35,12 +35,11 @@ public class Filters {
 	};
 	
 	/**
-	 * After filter
+	 * Before filter
 	 * Add content type and CORS needed headers to the response.
 	 */
 	public static Filter addResponseHeaders = (Request request, Response response) -> {
 		response.header("Content-Type", "application/json");
-		response.header("Access-Control-Allow-Origin", "http://localhost:1818");
 	};
 	
 	/**

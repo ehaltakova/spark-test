@@ -40,7 +40,7 @@ public class SlideAlbumsMgrIntTest {
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("customers", Arrays.asList("Harley Davidson"));
 		data.put("sessionToken", "exampleSessionTokenHere");
-		TestResponse response = TestUtil.postRequest("/spark/api/slidealbums", data);
+		TestResponse response = TestUtil.postRequest("/spark/api/public/slidealbums", data);
 		assertEquals(200, response.status); 		
 		String body = response.body;
 		JsonObject jobj = JsonUtil.fromJsonToClass(body, JsonObject.class);
@@ -67,10 +67,15 @@ public class SlideAlbumsMgrIntTest {
 		
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("customers", Arrays.asList("Harley Davidson"));
-		TestResponse response = TestUtil.postRequest("/spark/api/slidealbums", data);
+		TestResponse response = TestUtil.postRequest("/spark/api/public/slidealbums", data);
 		assertEquals(401, response.status); // no/invalid session token is passed, so request is unauthorized
 		String body = response.body;
 		assertTrue(body == null || body.equals(""));
+	}
+	
+	@Test
+	public void createSlideAlbumTest() {
+		// TODO
 	}
 	
 	@Test
