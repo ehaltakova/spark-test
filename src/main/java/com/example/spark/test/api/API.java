@@ -22,9 +22,9 @@ public class API {
 		 
 		SlideAlbumsMgr slideAlbumsMgr = new SlideAlbumsMgr();
 		
-		before(Filters.ensureSessionTokenIsValid);
-		after(Filters.addResponseHeaders);
-		after(Filters.regenerateSessionToken);
+		before("/spark/api/*", Filters.ensureSessionTokenIsValid);
+		after("/spark/api/*", Filters.addResponseHeaders);
+		after("/spark/api/*", Filters.regenerateSessionToken);
 		
 		get("/hello", (req, res) -> "Hello World");
 		 
@@ -35,7 +35,18 @@ public class API {
 			HashMap<String, Object> responseData = new HashMap<String, Object>();
 			responseData.put("slideAlbums", slideAlbums);
 			return new Gson().toJson(responseData);
-		});		 
+		});		
+		
+		// test route
+		get("/test/api/slidealbum/*/*", (request, response) -> {
+			String customer = request.splat()[0];
+			String title = request.splat()[1];
+			SlideAlbum slideAlbum = slideAlbumsMgr.getSlideAlbum(title, customer);
+			if(slideAlbum == null) {
+				halt(404, "No such slide album is found");
+			}
+			return new Gson().toJson(slideAlbum);
+		});		
 	}
 	
 }

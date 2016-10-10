@@ -7,12 +7,14 @@ import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
 
+import com.example.spark.test.slidealbums.SlideAlbum.Builder;
+
 public class SlideAlbumsMgr {
 
 	private String workspacesDir;
 	
 	public SlideAlbumsMgr() {
-		workspacesDir = "D:/xampp-7/htdocs/workspaces";
+		workspacesDir = "D:/xampp-7/htdocs/workspaces"; // TOOD: get from config
 	}
 	
 	public List<SlideAlbum> getSlideAlbums(List<String> customers) {	
@@ -47,8 +49,38 @@ public class SlideAlbumsMgr {
 		return slideAlbums;
 	}
 	
+	public SlideAlbum getSlideAlbum(String title, String customer) {
+		
+		SlideAlbum slideAlbum = null;
+		String pathToSlideAlbumDir = workspacesDir + "/" + customer + "/" + title;
+		File slideAlbumDir = new File(pathToSlideAlbumDir);
+		if(slideAlbumDir.exists()) {
+			SlideAlbum.Builder builder = new Builder(title, customer);
+			builder = builder.modificationDate(slideAlbumDir.lastModified());
+			File[] files = slideAlbumDir.listFiles();
+			List<SlideAlbumFile> slideAlbumFiles = new ArrayList<SlideAlbumFile>();
+			for(File file : files) {
+				String ext = FilenameUtils.getExtension(file.getName());
+				String name = FilenameUtils.getBaseName(file.getName());
+				if(ext.equals("txt")) {
+					String lockedByUsr = name.split("_")[name.split("_").length-1];
+					builder = builder.lockedBy(lockedByUsr);
+				} else {
+					slideAlbumFiles.add(new SlideAlbumFile(ext, name));
+					if(ext.equals("svg")) {
+						builder = builder.svg(name);
+					}
+				}
+			}
+			builder = builder.files(slideAlbumFiles);
+			slideAlbum = builder.build();
+		} 
+		return slideAlbum;
+	}
+	
 	// for test purposes
 	public static void main(String[] args) {
 		System.out.println(new SlideAlbumsMgr().getSlideAlbums(Arrays.asList("Bosch", "Harley Davidson")));
+		System.out.println(new SlideAlbumsMgr().getSlideAlbum("AC 2", "Bosch"));
 	}
 }

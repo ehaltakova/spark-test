@@ -72,4 +72,23 @@ public class SlideAlbumsMgrIntTest {
 		assertTrue(body == null || body.equals(""));
 	}
 	
+	@Test
+	public void getSlideAlbum() {
+		
+		String title = "AC 2";
+		String customer = "Bosch";
+		
+		String url = TestUtil.constructURL("http", "localhost", 4567, "/test/api/slidealbum/" + customer + "/" + title);
+		TestResponse response = TestUtil.getRequest(url);
+		assertEquals(200, response.status); 
+		String body = response.body;
+		assertFalse(body == null || body.equals(""));
+		SlideAlbum album = new Gson().fromJson(body, SlideAlbum.class);
+		assertEquals(album.getTitle(), title);
+		assertEquals(album.getCustomer(), customer);
+		assertEquals("AC2_updated", album.getSvg());
+		assertTrue(album.getFiles().size() == 3);
+
+	}
+	
 }

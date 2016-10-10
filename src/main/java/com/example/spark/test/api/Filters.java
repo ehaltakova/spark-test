@@ -26,6 +26,9 @@ public class Filters {
 	 */
 	public static Filter ensureSessionTokenIsValid = (Request request, Response response) -> {
 		HashMap<String, Object> requestData = new Gson().fromJson(request.body(), HashMap.class);
+		if(requestData == null) {
+			Spark.halt(401, "Unauthorized access.");
+		}
 		String sessionToken = requestData.get("sessionToken") != null ? (String) requestData.get("sessionToken") : null;
 		if(sessionToken == null || !authMgr.isSessionTokenValid(sessionToken)) {
 			Spark.halt(401);
