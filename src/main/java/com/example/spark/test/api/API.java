@@ -62,16 +62,27 @@ public class API {
 			item.write(new File(uploadDir, fileName));
 			
 			SlideAlbum slidealbum = slideAlbumsMgr.createSlideAlbum(title, customer, fileName);
-			
+			if(slidealbum == null) {
+				halt(500, "Error occured. Slide albums was not created.");
+			}
 			AuthenticationMgr authMgr = new AuthenticationMgr();
 			sessionToken = authMgr.regenerateSessionToken(sessionToken);
 			HashMap<String, Object> responseData = new HashMap<String, Object>();
 			responseData.put("sessiontoken", sessionToken);
 			responseData.put("slideAlbum", slidealbum);
-            
 			return JsonUtil.toJson(responseData);
-
-		}) ;
+		});
+		
+		post("/spark/api/public/slidealbums/delete", (request, response) -> {
+			HashMap<String, Object> data = JsonUtil.fromJson(request.body());
+			String title = data.get("title").toString();
+			String customer = data.get("customer").toString();
+			boolean success = slideAlbumsMgr.deleteSlideAlbum(title, customer);
+			if(!success) {
+				halt(500, "Error occured. Slide album was not found or wasn't deleted successfully.");
+			} 
+			return "";
+		});		
 		
 		// test route
 		get("/hello", (req, res) -> "Hello World");

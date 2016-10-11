@@ -5,17 +5,12 @@ import static org.junit.Assert.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 
@@ -81,23 +76,6 @@ public class TestUtil {
 			this.status = status;
 			this.body = body;
 		}
-	}
-	
-	public static String constructURL(String scheme, String host, int port, String path) {
-		String urlStr = null;
-		try {
-			URIBuilder uriBuilder = new URIBuilder().setHost(host).setScheme(scheme).setPort(port).setPath(path);
-			URI uri = uriBuilder.build();			
-			URL url = uri.toURL();
-			urlStr = url.toString();
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return urlStr;
 	}
 }
 

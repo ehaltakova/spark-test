@@ -1,10 +1,12 @@
 package com.example.spark.test.slidealbums;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import com.example.spark.test.slidealbums.SlideAlbum.Builder;
@@ -51,7 +53,6 @@ public class SlideAlbumsMgr {
 	}
 	
 	public SlideAlbum getSlideAlbum(String title, String customer) {
-		
 		SlideAlbum slideAlbum = null;
 		String pathToSlideAlbumDir = workspacesDir + "/" + customer + "/" + title;
 		File slideAlbumDir = new File(pathToSlideAlbumDir);
@@ -79,10 +80,8 @@ public class SlideAlbumsMgr {
 		return slideAlbum;
 	}
 	
-	public SlideAlbum createSlideAlbum(String title, String customer, String fileName) {
-
+	public SlideAlbum createSlideAlbum(String title, String customer, String fileName) {	
 		SlideAlbum slideAlbum = null;
-		
 		File customerDir = new File(this.workspacesDir + "/" + customer);
 		if(!customerDir.exists()) {
 			customerDir.mkdir();
@@ -91,21 +90,33 @@ public class SlideAlbumsMgr {
 		slideAlbumDir.mkdir();
 		File file = new File(Util.uploadDirPath + "/" + fileName);
 		file.renameTo(new File(slideAlbumDir.getPath() + "/" + fileName));
-		
 		SlideAlbum.Builder builder = new Builder(title, customer).modificationDate(slideAlbumDir.lastModified()).svg(FilenameUtils.getBaseName(fileName));
 		List<SlideAlbumFile> files = new ArrayList<SlideAlbumFile>(); 
 		files.add(new SlideAlbumFile("svg", FilenameUtils.getBaseName(fileName)));
 		slideAlbum = builder.files(files).build();
-		
 		return slideAlbum;
 	}
-	
+
+	public boolean deleteSlideAlbum(String title, String customer) {
+		boolean success = true;
+		File slideAlbumDir = new File(this.workspacesDir + "/" + customer + "/" + title);
+		if(slideAlbumDir.exists()) {
+			try {
+				FileUtils.deleteDirectory(slideAlbumDir);
+			} catch (IOException e) {
+				success = false;
+			}
+		} else {
+			success = false;
+		}
+		return success;
+	}
+
 	// for test purposes
 	public static void main(String[] args) {
 		System.out.println(new SlideAlbumsMgr().getSlideAlbums(Arrays.asList("Bosch", "Harley Davidson")));
 		System.out.println(new SlideAlbumsMgr().getSlideAlbum("AC 2", "Bosch"));
-		System.out.println(new SlideAlbumsMgr().createSlideAlbum("Eli test 1234567", "Bosch", "Central Locking_01.svg"));
-		
+		System.out.println(new SlideAlbumsMgr().createSlideAlbum("Eli test 1234567", "Bosch", "Central Locking_01.svg"));		
+		System.out.println(new SlideAlbumsMgr().deleteSlideAlbum("Eli test 1234567", "Bosch"));		
 	}
-
 }

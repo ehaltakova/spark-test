@@ -8,4 +8,12 @@ public class SlideAlbumFile {
 		this.ext = extension;
 		this.name = name;
 	}
+
+	public String getExt() {
+		return ext;
+	}
+
+	public String getName() {
+		return name;
+	}
 }

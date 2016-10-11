@@ -11,6 +11,8 @@ public class JsonUtil {
 	public static HashMap<String, Object> fromJson(String json) {
 		Type collectionType = new TypeToken<HashMap<String, Object>>(){}.getType();
 		HashMap<String, Object> data = new Gson().fromJson(json, collectionType);
+		if(data == null)
+			data = new HashMap<String, Object>();
 		return data;
 	}
 	
