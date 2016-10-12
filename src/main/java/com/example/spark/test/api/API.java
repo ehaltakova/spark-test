@@ -44,8 +44,10 @@ public class API {
 		
 		// exception handling
 		exception(Exception.class, (e, req, res) -> {
+			System.out.println(e.getMessage());
+			e.printStackTrace(System.out);
 			res.status(500);
-			res.body(JsonUtil.toJson(new ResponseError("An internal error occured. Please, contact your administrator.").getMessage()));
+			res.body(JsonUtil.toJson(new ResponseError("An internal error occured. Please, contact your system administrator.").getMessage()));
 		});
 		
 		// routes
@@ -54,7 +56,7 @@ public class API {
 			HashMap<String, Object> data = JsonUtil.fromJson(request.body());
 			if(data == null || data.get("customers") == null) {
 				response.status(400);
-				return JsonUtil.toJson(new ResponseError("Invalid request. Please, contact your administrator.").getMessage());
+				return JsonUtil.toJson(new ResponseError("Invalid request. Please, contact your system administrator.").getMessage());
 			}
 			@SuppressWarnings("unchecked")
 			List<String> customers = (List<String>) data.get("customers");			
@@ -90,7 +92,7 @@ public class API {
 			}
 			if(title == null || customer == null || fileName == null) {
 				response.status(400);
-				return JsonUtil.toJson(new ResponseError("Invalid request. Please, contact your administrator.").getMessage());
+				return JsonUtil.toJson(new ResponseError("Invalid request. Please, contact your system administrator.").getMessage());
 			}
 			
 			// call business function
@@ -113,10 +115,10 @@ public class API {
 			HashMap<String, Object> data = JsonUtil.fromJson(request.body());
 			if(data == null || data.get("title") == null || data.get("customer") == null) {
 				response.status(400);
-				return JsonUtil.toJson(new ResponseError("Invalid request. Please, contact your administrator.").getMessage());
+				return JsonUtil.toJson(new ResponseError("Invalid request. Please, contact your system administrator.").getMessage());
 			}
-			String title = data.get("title").toString();
-			String customer = data.get("customer").toString();
+			String title = (String) data.get("title");
+			String customer = (String) data.get("customer");
 			
 			// call business function
 			boolean success = slideAlbumsMgr.deleteSlideAlbum(title, customer);
@@ -124,7 +126,9 @@ public class API {
 			// handle response
 			if(!success) {
 				response.status(400);
-				return JsonUtil.toJson(new ResponseError("An error occured. Slide album was not deleted successfully. Please, contact your administrator.").getMessage());			} 
+				return JsonUtil.toJson(new ResponseError("An error occured. Slide album was not deleted successfully. Please, contact your system administrator.").getMessage());	
+			}
+			
 			return "";
 		});		
 		

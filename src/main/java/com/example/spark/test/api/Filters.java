@@ -47,11 +47,13 @@ public class Filters {
 	 * Regenerate session token and put the new one into the response
 	 */
 	public static Filter regenerateSessionToken = (Request request, Response response) -> {
-		HashMap<String, Object> requestData = JsonUtil.fromJson(request.body());
-		String oldSessionToken = requestData.get("sessionToken") != null ? (String) requestData.get("sessionToken") : null;
-		String newSessionToken = authMgr.regenerateSessionToken(oldSessionToken);
-		HashMap<String, Object> responseData = JsonUtil.fromJson(response.body());
-		responseData.put("sessionToken", newSessionToken);
-		response.body(JsonUtil.toJson(responseData));
+		if(response.raw().getStatus() == 200) {
+			HashMap<String, Object> requestData = JsonUtil.fromJson(request.body());
+			String oldSessionToken = requestData.get("sessionToken") != null ? (String) requestData.get("sessionToken") : null;
+			String newSessionToken = authMgr.regenerateSessionToken(oldSessionToken);
+			HashMap<String, Object> responseData = JsonUtil.fromJson(response.body());
+			responseData.put("sessionToken", newSessionToken);
+			response.body(JsonUtil.toJson(responseData));
+		}
 	};
 }
