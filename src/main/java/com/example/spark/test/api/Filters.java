@@ -56,4 +56,18 @@ public class Filters {
 			response.body(JsonUtil.toJson(responseData));
 		}
 	};
+
+	/**
+	 * After filter.
+	 * Logs response status and body to the log file and the console.
+	 */
+	public static Filter logResponse = (Request request, Response response) -> {
+		if(response.raw().getStatus() == 200) {
+			API.logger.debug(request.pathInfo() + ": " + response.raw().getStatus());
+			API.logger.debug(response.body());
+		} else {
+			API.logger.error(request.pathInfo() + ": " + response.raw().getStatus());
+			API.logger.error(response.body());
+		}
+	};
 }

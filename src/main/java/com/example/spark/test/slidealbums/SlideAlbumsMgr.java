@@ -8,7 +8,9 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.log4j.Logger;
 
+import com.example.spark.test.api.API;
 import com.example.spark.test.slidealbums.SlideAlbum.Builder;
 import com.example.spark.test.util.Util;
 
@@ -19,10 +21,10 @@ import com.example.spark.test.util.Util;
  */
 public class SlideAlbumsMgr {
 
-	private String workspacesDir;
+	final static Logger logger = Logger.getLogger(API.class); 
+	final static String workspacesDir = "D:/xampp-7/htdocs/workspaces";
 	
 	public SlideAlbumsMgr() {
-		workspacesDir = "D:/xampp-7/htdocs/workspaces"; // TOOD: get from config
 	}
 	
 	public List<SlideAlbum> getSlideAlbums(List<String> customers) {	
@@ -87,11 +89,11 @@ public class SlideAlbumsMgr {
 	
 	public SlideAlbum createSlideAlbum(String title, String customer, String fileName) {	
 		SlideAlbum slideAlbum = null;
-		File customerDir = new File(this.workspacesDir + "/" + customer);
+		File customerDir = new File(workspacesDir + "/" + customer);
 		if(!customerDir.exists()) {
 			customerDir.mkdir();
 		}
-		File slideAlbumDir = new File(this.workspacesDir + "/" + customer + "/" + title);
+		File slideAlbumDir = new File(workspacesDir + "/" + customer + "/" + title);
 		slideAlbumDir.mkdir();
 		File file = new File(Util.uploadDirPath + "/" + fileName);
 		file.renameTo(new File(slideAlbumDir.getPath() + "/" + fileName));
@@ -104,13 +106,13 @@ public class SlideAlbumsMgr {
 
 	public boolean deleteSlideAlbum(String title, String customer) {
 		boolean success = true;
-		File slideAlbumDir = new File(this.workspacesDir + "/" + customer + "/" + title);
+		File slideAlbumDir = new File(workspacesDir + "/" + customer + "/" + title);
 		if(slideAlbumDir.exists()) {
 			try {
 				FileUtils.deleteDirectory(slideAlbumDir);
 			} catch (IOException e) {
 				success = false;
-				e.printStackTrace(System.out);
+				logger.error(e.getMessage(), e);
 			}
 		} else {
 			success = false;

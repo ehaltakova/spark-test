@@ -18,40 +18,40 @@ import com.example.spark.test.util.JsonUtil;
 import com.example.spark.test.util.Util;
 
 import spark.Spark;
-
+import org.apache.log4j.Logger;
 /**
  * Main API class defining all the end points
  * @author Elitza Haltakova
  *
  */
 public class API {
+	
+	final static Logger logger = Logger.getLogger(API.class);
 
 	public static void main(String[] args) {
 		
-		// business function mgrs
+		// initialize business function mgrs
 		SlideAlbumsMgr slideAlbumsMgr = new SlideAlbumsMgr();
 		
-		// static resources folder used to store uploaded files
+		// configure static resources folder (used to store uploaded files)
 		File uploadDir = Util.configureUploadFilesDir();
 		
 		// enable CORS
 		CORSUtil.enableCORS();
 
-		// before and after filters
+		// set up before and after filters
 		before("/spark/api/public/*", Filters.ensureSessionTokenIsValid);
 		before(Filters.addResponseHeaders);
 		after("/spark/api/public/*", Filters.regenerateSessionToken);
+		after(Filters.logResponse);
 		
-		// exception handling
-		exception(Exception.class, (e, req, res) -> {
-			System.out.println(e.getMessage());
-			e.printStackTrace(System.out);
-			res.status(500);
-			res.body(JsonUtil.toJson(new ResponseError("An internal error occured. Please, contact your system administrator.").getMessage()));
-		});
+		// register exception handling
+		exception(Exception.class, ExceptionHandlers.uncheckedExceptions);
 		
 		// routes
-		post("/spark/api/public/slidealbums", (request, response) -> {	
+		post(Path.GET_SLIDEALBUMS, (request, response) -> {	
+			logger.debug(request.pathInfo() + "  Get Slidealbums");
+			logger.debug(request.body());
 			// handle request
 			HashMap<String, Object> data = JsonUtil.fromJson(request.body());
 			if(data == null || data.get("customers") == null) {
@@ -70,7 +70,9 @@ public class API {
 			return JsonUtil.toJson(responseData);
 		});		
 		
-		post("/spark/api/slidealbums/create", (request, response) -> {
+		post(Path.CREATE_SLIDEALBUM, (request, response) -> {
+			logger.debug(request.pathInfo() + "  Create Slidealbum");
+			logger.debug(request.body());
 			
 			// apache commons-fileupload to handle file upload with multi part request
 			DiskFileItemFactory factory = new DiskFileItemFactory();
@@ -110,7 +112,10 @@ public class API {
 			return JsonUtil.toJson(responseData);
 		});
 		
-		post("/spark/api/public/slidealbums/delete", (request, response) -> {
+		post(Path.DELETE_SLIDEALBUM, (request, response) -> {
+			logger.debug(request.pathInfo() + "  Delete Slidealbum");
+			logger.debug(request.body());
+			
 			// handle request
 			HashMap<String, Object> data = JsonUtil.fromJson(request.body());
 			if(data == null || data.get("title") == null || data.get("customer") == null) {
@@ -128,15 +133,14 @@ public class API {
 				response.status(400);
 				return JsonUtil.toJson(new ResponseError("An error occured. Slide album was not deleted successfully. Please, contact your system administrator.").getMessage());	
 			}
-			
 			return "";
 		});		
-		
-		// test route
-		get("/hello", (req, res) -> "Hello World");
 
 		// test route
-		get("/test/api/slidealbum/*/*", (request, response) -> {
+		get("/spark/api/test/slidealbum/*/*", (request, response) -> {
+			logger.debug(request.pathInfo() + "  Get Slidealbum");
+			logger.debug(request.body());
+			
 			// handle request
 			if(request.splat() == null || request.splat().length < 2) {
 				response.status(400);
@@ -149,10 +153,12 @@ public class API {
 			// handle response
 			if (slideAlbum == null) {
 				response.status(400);
-				return JsonUtil.toJson(new ResponseError("No slide album with the title '%s' was found.", title).getMessage());
+				return JsonUtil.toJson(new ResponseError("No slide album with the title %s was found.", title).getMessage());
 			}
 			return JsonUtil.toJson(slideAlbum);
 		});
-	}
-	
+		
+		// test route
+		get("/hello", (req, res) -> "Hello World");
+	}	
 }
