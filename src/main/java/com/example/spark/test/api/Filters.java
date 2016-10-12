@@ -26,11 +26,11 @@ public class Filters {
 	public static Filter ensureSessionTokenIsValid = (Request request, Response response) -> {
 		HashMap<String, Object> requestData = JsonUtil.fromJson(request.body());
 		if(requestData == null) {
-			Spark.halt(401, "Unauthorized access.");
+			Spark.halt(403, "Invalid request.");
 		}
 		String sessionToken = requestData.get("sessionToken") != null ? (String) requestData.get("sessionToken") : null;
 		if(sessionToken == null || !authMgr.isSessionTokenValid(sessionToken)) {
-			Spark.halt(401);
+			Spark.halt(401, "Your session is invalid or expired. Please, login again.");
 		}
 	};
 	

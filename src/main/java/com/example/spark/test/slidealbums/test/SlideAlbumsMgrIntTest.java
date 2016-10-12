@@ -17,8 +17,8 @@ import com.example.spark.test.api.API;
 import com.example.spark.test.slidealbums.SlideAlbum;
 import com.example.spark.test.slidealbums.SlideAlbumsMgr;
 import com.example.spark.test.util.JsonUtil;
-import com.example.spark.test.util.TestUtil;
-import com.example.spark.test.util.TestUtil.TestResponse;
+import com.example.spark.test.util.HTTPUtil;
+import com.example.spark.test.util.HTTPUtil.TestResponse;
 import com.example.spark.test.util.Util;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -86,7 +86,7 @@ public class SlideAlbumsMgrIntTest {
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("customers", Arrays.asList("Bosch"));
 		data.put("sessionToken", "exampleSessionTokenHere");
-		TestResponse response = TestUtil.postRequest("/spark/api/public/slidealbums", data);
+		TestResponse response = HTTPUtil.postRequest("/spark/api/public/slidealbums", data);
 		assertEquals(200, response.status); 		
 		String body = response.body;
 		JsonObject jobj = JsonUtil.fromJsonToClass(body, JsonObject.class);
@@ -112,7 +112,7 @@ public class SlideAlbumsMgrIntTest {
 	public void getSlideAlbumsTestInvalidToken() {	
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("customers", Arrays.asList("Bosch"));
-		TestResponse response = TestUtil.postRequest("/spark/api/public/slidealbums", data);
+		TestResponse response = HTTPUtil.postRequest("/spark/api/public/slidealbums", data);
 		assertEquals(401, response.status); // no/invalid session token is passed, so request is unauthorized
 		String body = response.body;
 		assertTrue(body == null || body.equals(""));
@@ -123,8 +123,8 @@ public class SlideAlbumsMgrIntTest {
 		String title = "Eli Test 123";
 		String customer = "Bosch";
 		String svg = "Central Locking_01";
-		String url = Util.constructURL("http", "localhost", 4567, "/test/api/slidealbum/" + customer + "/" + title);
-		TestResponse response = TestUtil.getRequest(url);
+		String url = HTTPUtil.constructURL("http", "localhost", 4567, "/test/api/slidealbum/" + customer + "/" + title);
+		TestResponse response = HTTPUtil.getRequest(url);
 		assertEquals(200, response.status); 
 		String body = response.body;
 		assertFalse(body == null || body.equals(""));
@@ -145,7 +145,7 @@ public class SlideAlbumsMgrIntTest {
 		data.put("title", title);
 		data.put("customer", customer);
 		data.put("sessionToken", "exampleSessionTokenHere");
-		TestResponse response = TestUtil.postRequest("/spark/api/public/slidealbums/delete", data);
+		TestResponse response = HTTPUtil.postRequest("/spark/api/public/slidealbums/delete", data);
 		assertEquals(200, response.status); 		
 		String body = response.body;
 		JsonObject jobj = JsonUtil.fromJsonToClass(body, JsonObject.class);
@@ -178,7 +178,7 @@ public class SlideAlbumsMgrIntTest {
 		data.put("sessionToken", sessionToken);
 		data.put("files[]", dest);
 		
-		TestResponse response = TestUtil.postMultiPartRequest(url, data);
+		TestResponse response = HTTPUtil.postMultiPartRequest(url, data);
 		assertEquals(200, response.status); 		
 		String body = response.body;
 		JsonObject jobj = JsonUtil.fromJsonToClass(body, JsonObject.class);

@@ -110,6 +110,7 @@ public class SlideAlbumsMgr {
 				FileUtils.deleteDirectory(slideAlbumDir);
 			} catch (IOException e) {
 				success = false;
+				e.printStackTrace();
 			}
 		} else {
 			success = false;
