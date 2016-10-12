@@ -4,8 +4,14 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 
+/**
+ * JSON util class using GSON library to manipulate JSOO data.
+ * @author Elitza Haltakova
+ *
+ */
 public class JsonUtil {
 		
 	public static HashMap<String, Object> fromJson(String json) {
@@ -17,6 +23,11 @@ public class JsonUtil {
 	}
 	
 	public static <T> T fromJsonToClass(String json, Class<T> objClass) {
+		T data = new Gson().fromJson(json, objClass);
+		return data;
+	}
+	
+	public static <T> T fromJsonElementToClass(JsonElement json, Class<T> objClass) {
 		T data = new Gson().fromJson(json, objClass);
 		return data;
 	}

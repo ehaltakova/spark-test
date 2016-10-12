@@ -8,14 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.commons.io.FilenameUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,15 +23,17 @@ import com.example.spark.test.util.Util;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 
 import spark.Spark;
 
+/**
+ * Slide Albums Manager Tests
+ * @author Elitza Haltakova
+ *
+ */
 public class SlideAlbumsMgrIntTest {
 
 	@BeforeClass
@@ -54,7 +49,7 @@ public class SlideAlbumsMgrIntTest {
 	}
 	
 	@Test
-	public void createSlideAlbumTest() {
+	public void createSlideAlbumMgrTest() {
 		// prepare for the request - upload svg file to the upload directory
 		String svg = "Electronic Control Module (ECM)_01.svg";
 		File source = new File("src/test/resources/" + svg);
@@ -161,11 +156,12 @@ public class SlideAlbumsMgrIntTest {
 	}
 	
 	@Test 
-	public void testMultiPartRequess() {
+	public void createSlideAlbumMultiPartRequestTest() {
 		
 		String url = "http://localhost:4567/spark/api/slidealbums/create";
 		String svg = "Anti-lock Brake System (ABS)_01.svg";
-		String title = "Fucking test";
+		String fileName = FilenameUtils.getBaseName(svg);
+		String title = "Test Multipart Request";
 		String customer = "Bosch";
 		String sessionToken = "test123";
 		File source = new File("src/test/resources/" + svg);
@@ -176,46 +172,41 @@ public class SlideAlbumsMgrIntTest {
 			e.printStackTrace();
 		}
 		
-		HttpClient httpclient = HttpClientBuilder.create().build();
-		HttpPost httpPost = new HttpPost(url);
-
-		FileBody uploadFilePart = new FileBody(new File(Util.uploadDirPath + "/" + svg));
-		MultipartEntity reqEntity = new MultipartEntity();
-		try {
-			reqEntity.addPart("title", new StringBody(title));
-			reqEntity.addPart("customer", new StringBody(customer));
-			reqEntity.addPart("sessionToken", new StringBody(sessionToken));
-			reqEntity.addPart("files[]", uploadFilePart);
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		httpPost.setEntity(reqEntity);
-		try {
-			HttpResponse resp = httpclient.execute(httpPost);
-			
-			BufferedReader rd = new BufferedReader(new InputStreamReader(resp.getEntity().getContent()));
-			StringBuffer result = new StringBuffer();
-			String line = "";
-			while ((line = rd.readLine()) != null) {
-				result.append(line);
-			}
-			String responseText = result.toString();
-			System.out.println(new TestResponse(resp.getStatusLine().getStatusCode(), responseText));
-		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		HashMap<String, Object> data = new HashMap<String, Object>();
+		data.put("title", title);
+		data.put("customer", customer);
+		data.put("sessionToken", sessionToken);
+		data.put("files[]", dest);
+		
+		TestResponse response = TestUtil.postMultiPartRequest(url, data);
+		assertEquals(200, response.status); 		
+		String body = response.body;
+		JsonObject jobj = JsonUtil.fromJsonToClass(body, JsonObject.class);
+		sessionToken = jobj.get("sessionToken").getAsString();
+		SlideAlbum album = JsonUtil.fromJsonElementToClass(jobj.get("slideAlbum"), SlideAlbum.class);
+		
+		assertNotNull(sessionToken);
+		assertNotNull(album);
+		assertNotNull(album.getTitle());
+		assertEquals(title, album.getTitle());
+		assertNotNull(album.getCustomer());
+		assertEquals(customer, album.getCustomer());
+		assertNotNull(album.getSvg());
+		assertEquals(fileName, album.getSvg());
+		assertNotNull(album.getFiles());
+		assertTrue(album.getFiles().size() == 1);
+		assertEquals(fileName, album.getFiles().get(0).getName());
+		assertEquals("svg", album.getFiles().get(0).getExt());
+		deleteSlideAlbum(title, customer);
 	}
 	
+	// helper method
 	private static void deleteSlideAlbum(String title, String customer) {
 		SlideAlbumsMgr mgr = new SlideAlbumsMgr();
 		mgr.deleteSlideAlbum(title, customer);
 	}
 	
+	// helper method
 	private static void createSlideAlbum(String title, String customer, String svg) {
 		File source = new File("src/test/resources/" + svg);
 		File dest = new File(Util.uploadDirPath + "/" + svg);

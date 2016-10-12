@@ -10,6 +10,11 @@ import java.net.URL;
 
 import org.apache.http.client.utils.URIBuilder;
 
+/**
+ * Utility class providing common helper features
+ * @author Elitza Haltakova
+ *
+ */
 public class Util {
 
 	public static String uploadDirPath = "upload";

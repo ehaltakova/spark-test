@@ -12,6 +12,11 @@ import org.apache.commons.io.FilenameUtils;
 import com.example.spark.test.slidealbums.SlideAlbum.Builder;
 import com.example.spark.test.util.Util;
 
+/**
+ * Slide Albums Manager class handling retrieval and CRUD of slide albums.
+ * @author Elitza Haltakova
+ *
+ */
 public class SlideAlbumsMgr {
 
 	private String workspacesDir;

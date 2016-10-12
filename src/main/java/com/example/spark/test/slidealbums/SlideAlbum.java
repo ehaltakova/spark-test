@@ -2,6 +2,12 @@ package com.example.spark.test.slidealbums;
 
 import java.util.List;
 
+/**
+ * Slide Album model class.
+ * Uses Builder pattern.
+ * @author Elitza Haltakova
+ *
+ */
 public class SlideAlbum {
 
 	private String title;

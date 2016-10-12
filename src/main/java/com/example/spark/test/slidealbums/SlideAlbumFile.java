@@ -1,5 +1,10 @@
 package com.example.spark.test.slidealbums;
 
+/**
+ * Slide Album File model class
+ * @author Elitza Haltakova
+ *
+ */
 public class SlideAlbumFile {
 	String ext;
 	String name;

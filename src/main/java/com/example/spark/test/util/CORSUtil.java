@@ -4,7 +4,7 @@ import static spark.Spark.before;
 import static spark.Spark.options;
 
 /**
- * Cross-origin request support
+ * Utility class to enable cross-origin request support
  * @author Elitza Haltakova
  *
  */

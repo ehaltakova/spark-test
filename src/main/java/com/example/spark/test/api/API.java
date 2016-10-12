@@ -68,7 +68,7 @@ public class API {
 			AuthenticationMgr authMgr = new AuthenticationMgr();
 			sessionToken = authMgr.regenerateSessionToken(sessionToken);
 			HashMap<String, Object> responseData = new HashMap<String, Object>();
-			responseData.put("sessiontoken", sessionToken);
+			responseData.put("sessionToken", sessionToken);
 			responseData.put("slideAlbum", slidealbum);
 			return JsonUtil.toJson(responseData);
 		});
