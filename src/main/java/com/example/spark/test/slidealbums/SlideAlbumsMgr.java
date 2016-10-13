@@ -10,7 +10,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
-import com.example.spark.test.api.API;
 import com.example.spark.test.slidealbums.SlideAlbum.Builder;
 import com.example.spark.test.util.Util;
 
@@ -21,7 +20,7 @@ import com.example.spark.test.util.Util;
  */
 public class SlideAlbumsMgr {
 
-	final static Logger logger = Logger.getLogger(API.class); 
+	final static Logger logger = Logger.getLogger(SlideAlbumsMgr.class); 
 	final static String workspacesDir = "D:/xampp-7/htdocs/workspaces";
 	
 	public SlideAlbumsMgr() {
