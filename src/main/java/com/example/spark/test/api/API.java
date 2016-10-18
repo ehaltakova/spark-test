@@ -18,19 +18,26 @@ import com.example.spark.test.util.JsonUtil;
 import com.example.spark.test.util.Util;
 
 import spark.Spark;
+import spark.servlet.SparkApplication;
+
 import org.apache.log4j.Logger;
 /**
  * Main API class defining all the end points
  * @author Elitza Haltakova
  *
  */
-public class API {
+public class API implements SparkApplication{ 
 	
 	final static Logger logger = Logger.getLogger(API.class);
 
 	public static void main(String[] args) {
-		
-		// initialize business function mgrs
+		API api = new API();
+		api.init();		
+	}
+
+	@Override
+	public void init() {
+	// initialize business function mgrs
 		SlideAlbumsMgr slideAlbumsMgr = new SlideAlbumsMgr();
 		
 		// configure static resources folder (used to store uploaded files)
@@ -38,7 +45,7 @@ public class API {
 		
 		// enable CORS
 		CORSUtil.enableCORS();
-
+	
 		// set up before and after filters
 		before("/spark/api/public/*", Filters.ensureSessionTokenIsValid);
 		before(Filters.addResponseHeaders);
@@ -79,7 +86,7 @@ public class API {
 			factory.setRepository(uploadDir);
 			ServletFileUpload fileUpload = new ServletFileUpload(factory);
 			List<FileItem> items = fileUpload.parseRequest(request.raw());
-
+	
 			String title = items.stream().filter(e -> "title".equals(e.getFieldName())).findFirst().get().getString();
 			String customer = items.stream().filter(e -> "customer".equals(e.getFieldName())).findFirst().get().getString();
 			String sessionToken = items.stream().filter(e -> "sessionToken".equals(e.getFieldName())).findFirst().get().getString();
@@ -135,7 +142,7 @@ public class API {
 			}
 			return "";
 		});		
-
+	
 		// test route
 		get("/spark/api/test/slidealbum/*/*", (request, response) -> {
 			logger.debug(request.pathInfo() + "  Get Slidealbum");
