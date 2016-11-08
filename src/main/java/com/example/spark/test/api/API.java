@@ -37,7 +37,8 @@ public class API implements SparkApplication{
 
 	@Override
 	public void init() {
-	// initialize business function mgrs
+		
+		// initialize business function mgrs
 		SlideAlbumsMgr slideAlbumsMgr = new SlideAlbumsMgr();
 		
 		// configure static resources folder (used to store uploaded files)
@@ -122,7 +123,7 @@ public class API implements SparkApplication{
 		post(Path.DELETE_SLIDEALBUM, (request, response) -> {
 			logger.debug(request.pathInfo() + "  Delete Slidealbum");
 			logger.debug(request.body());
-			
+
 			// handle request
 			HashMap<String, Object> data = JsonUtil.fromJson(request.body());
 			if(data == null || data.get("title") == null || data.get("customer") == null) {
